@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\V1\AdminMembershipController;
 use App\Http\Controllers\Api\V1\AttendanceController;
 use App\Http\Controllers\Api\V1\MemberAttendanceHistoryController;
 use App\Http\Controllers\Api\V1\MemberAuthController;
@@ -8,6 +9,7 @@ use App\Http\Controllers\Api\V1\ReceptionistAttendanceController;
 use App\Http\Controllers\Api\V1\ReceptionistLockerController;
 use App\Http\Controllers\Api\V1\ReceptionistManualCheckInController;
 use App\Http\Controllers\Api\V1\ReceptionistMemberController;
+use App\Http\Controllers\Api\V1\ReceptionistMembershipController;
 use App\Http\Controllers\Api\V1\ReceptionistRejectedAttemptController;
 use App\Http\Controllers\Api\V1\ReceptionistSessionController;
 use App\Http\Controllers\Api\V1\StaffAuthController;
@@ -37,6 +39,7 @@ Route::prefix('v1')->group(function (): void {
         Route::get('rejected-attempts', [ReceptionistRejectedAttemptController::class, 'index']);
         Route::post('manual-checkin', [ReceptionistManualCheckInController::class, 'store'])
             ->middleware('throttle:manual-checkin');
+        Route::post('memberships', [ReceptionistMembershipController::class, 'store']);
         Route::patch('attendance/{logId}/assign-locker', [ReceptionistAttendanceController::class, 'assignLocker'])
             ->whereNumber('logId')
             ->middleware('throttle:assign-locker');
@@ -46,5 +49,10 @@ Route::prefix('v1')->group(function (): void {
             ->whereNumber('logId');
         Route::patch('attendance/{logId}/verify-identity', [ReceptionistAttendanceController::class, 'verifyIdentity'])
             ->whereNumber('logId');
+    });
+
+    Route::middleware(['auth:staff', 'role:admin'])->prefix('admin')->group(function (): void {
+        Route::patch('memberships/{membershipId}', [AdminMembershipController::class, 'update'])
+            ->whereNumber('membershipId');
     });
 });
