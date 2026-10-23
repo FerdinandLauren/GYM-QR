@@ -18,6 +18,7 @@ final class ManualCheckInService
     public function __construct(
         private readonly MembershipResolver $memberships,
         private readonly AuditLogger $audit,
+        private readonly FeedService $feed,
     ) {}
 
     /**
@@ -121,6 +122,17 @@ final class ManualCheckInService
                     'reason' => (string) $data['reason'],
                     'note' => $data['note'] ?? null,
                 ]);
+
+                DB::afterCommit(fn () => $this->feed->publish('attendance.created', [
+                    'log_id' => $logId,
+                    'user_id' => $member->user_id,
+                    'full_name' => $member->full_name,
+                    'photo_url' => $member->photo_url,
+                    'membership_type' => $membership->type,
+                    'locker_state' => ($data['locker_intent'] ?? 'no_locker') === 'need_locker' ? 'pending' : 'none',
+                    'checkin_time' => Carbon::parse((string) $now, 'UTC')->toIso8601ZuluString(),
+                    'checkin_method' => 'manual_receptionist',
+                ], $member->user_id));
 
                 $row = DB::table('attendance_logs as a')
                     ->join('memberships as m', 'm.membership_id', '=', 'a.membership_id')

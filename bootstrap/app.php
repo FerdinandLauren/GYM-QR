@@ -16,6 +16,10 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
+    ->withBroadcasting(
+        __DIR__.'/../routes/channels.php',
+        ['middleware' => ['web', 'auth:staff,member']],
+    )
     ->withMiddleware(function (Middleware $middleware) {
         // Sesi staf memakai cookie, jadi grup api butuh cookie + session middleware.
         $middleware->api(prepend: [

@@ -17,6 +17,7 @@ final class LockerService
     public function __construct(
         private readonly AuditLogger $audit,
         private readonly MembershipResolver $memberships,
+        private readonly FeedService $feed,
     ) {}
 
     /**
@@ -70,6 +71,12 @@ final class LockerService
                 'locker_id' => $lockerId,
                 'locker_number' => $locker->locker_number,
             ]);
+
+            DB::afterCommit(fn () => $this->feed->publish('locker.assigned', [
+                'log_id' => $logId,
+                'locker_number' => (string) $locker->locker_number,
+                'assigned_at' => Carbon::parse((string) $now, 'UTC')->toIso8601ZuluString(),
+            ], (int) $log->user_id));
 
             return [
                 'log_id' => $logId,
@@ -125,6 +132,20 @@ final class LockerService
                 'locker_id' => (int) $log->locker_id,
                 'locker_number' => $lockerNumber,
             ]);
+
+            DB::afterCommit(function () use ($logId, $lockerNumber, $log, $now): void {
+                $this->feed->publish('locker.returned', [
+                    'log_id' => $logId,
+                    'locker_number' => $lockerNumber,
+                    'returned_at' => Carbon::parse((string) $now, 'UTC')->toIso8601ZuluString(),
+                ], (int) $log->user_id);
+
+                $this->feed->publish('session.closed', [
+                    'log_id' => $logId,
+                    'checkout_time' => Carbon::parse((string) $now, 'UTC')->toIso8601ZuluString(),
+                    'checkout_type' => 'locker_returned',
+                ], (int) $log->user_id);
+            });
 
             return [
                 'log_id' => $logId,
@@ -193,6 +214,12 @@ final class LockerService
             ]);
 
             $this->audit->log($staff, 'attendance.identity_verified', 'attendance_log', $logId);
+
+            DB::afterCommit(fn () => $this->feed->publish('attendance.identity_verified', [
+                'log_id' => $logId,
+                'verified_by' => $staff->user_id,
+                'verified_at' => Carbon::parse((string) $now, 'UTC')->toIso8601ZuluString(),
+            ]));
 
             return [
                 'log_id' => $logId,

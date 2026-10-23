@@ -23,6 +23,7 @@ final class CheckInService
     public function __construct(
         private readonly MembershipResolver $memberships,
         private readonly AuditLogger $audit,
+        private readonly FeedService $feed,
     ) {}
 
     /**
@@ -119,13 +120,31 @@ final class CheckInService
                         'idempotency_key' => $key,
                     ]);
 
-                    return $this->payload($member, $this->rowById($member->user_id, $logId));
+                    $row = $this->rowById($member->user_id, $logId);
+
+                    DB::afterCommit(fn () => $this->feed->publish('attendance.created', [
+                        'log_id' => $logId,
+                        'user_id' => $member->user_id,
+                        'full_name' => $member->full_name,
+                        'photo_url' => $member->photo_url,
+                        'membership_type' => $membership->type,
+                        'locker_state' => $row->locker_state,
+                        'checkin_time' => $this->payload($member, $row)['checkin_time'],
+                    ], $member->user_id));
+
+                    return $this->payload($member, $row);
                 }, 3);
             } catch (ApiException $exception) {
                 if (in_array($exception->errorCode, ['MEMBERSHIP_EXPIRED', 'MEMBERSHIP_INACTIVE'], true)) {
                     $this->audit->log($member, 'attendance.scan_rejected', 'user', $member->user_id, null, [
                         'reason_code' => $exception->errorCode,
                     ]);
+
+                    $this->feed->publish('attendance.rejected', [
+                        'user_id' => $member->user_id,
+                        'full_name' => $member->full_name,
+                        'reason_code' => $exception->errorCode,
+                    ], $member->user_id);
                 }
 
                 throw $exception;
