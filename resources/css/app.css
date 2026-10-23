@@ -58,8 +58,13 @@
 
 /* §2.2 Warna mode gelap. Spec tidak menetapkan ulang ink-muted/hold/line,
    jadi token itu tetap memakai nilai mode terang. */
+:root {
+    color-scheme: light;
+}
+
 @media (prefers-color-scheme: dark) {
     :root:not([data-theme='light']) {
+        color-scheme: dark;
         --concrete: #0f1a24;
         --surface: #16242f;
         --ink: #e6ebef;
@@ -72,6 +77,7 @@
 
 /* Sakelar manual menang atas preferensi sistem. */
 :root[data-theme='dark'] {
+    color-scheme: dark;
     --concrete: #0f1a24;
     --surface: #16242f;
     --ink: #e6ebef;
@@ -94,12 +100,29 @@
 
 
 @layer base {
+    :root {
+        color-scheme: light;
+    }
+
     html {
         font-family: var(--font-sans);
     }
 
     body {
         background: var(--concrete);
+        color: var(--ink);
+    }
+
+    /* Kontrol native ikut token; tanpa ini teks putih tampil di atas putih pada mode gelap. */
+    input,
+    select,
+    textarea {
+        background-color: var(--surface);
+        color: var(--ink);
+    }
+
+    select option {
+        background-color: var(--surface);
         color: var(--ink);
     }
 
