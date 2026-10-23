@@ -44,3 +44,35 @@ export async function apiPost<T>(
 
     return payload.data as T;
 }
+
+export async function sessionGet<T>(path: string): Promise<T> {
+    const response = await fetch(path, {
+        headers: { Accept: 'application/json' },
+        credentials: 'same-origin',
+    });
+
+    const payload = await response.json();
+
+    if (!response.ok) {
+        throw payload as ApiError;
+    }
+
+    return payload.data as T;
+}
+
+export async function sessionPatch<T>(path: string, body: Record<string, unknown> = {}): Promise<T> {
+    const response = await fetch(path, {
+        method: 'PATCH',
+        headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify(body),
+    });
+
+    const payload = await response.json();
+
+    if (!response.ok) {
+        throw payload as ApiError;
+    }
+
+    return payload.data as T;
+}
