@@ -6,6 +6,9 @@ use App\Http\Controllers\Api\V1\MemberAuthController;
 use App\Http\Controllers\Api\V1\MemberProfileController;
 use App\Http\Controllers\Api\V1\ReceptionistAttendanceController;
 use App\Http\Controllers\Api\V1\ReceptionistLockerController;
+use App\Http\Controllers\Api\V1\ReceptionistManualCheckInController;
+use App\Http\Controllers\Api\V1\ReceptionistMemberController;
+use App\Http\Controllers\Api\V1\ReceptionistRejectedAttemptController;
 use App\Http\Controllers\Api\V1\ReceptionistSessionController;
 use App\Http\Controllers\Api\V1\StaffAuthController;
 use Illuminate\Support\Facades\Route;
@@ -30,6 +33,10 @@ Route::prefix('v1')->group(function (): void {
     Route::middleware(['auth:staff', 'role:receptionist,admin'])->prefix('receptionist')->group(function (): void {
         Route::get('lockers', [ReceptionistLockerController::class, 'index']);
         Route::get('sessions', [ReceptionistSessionController::class, 'index']);
+        Route::get('members', [ReceptionistMemberController::class, 'index']);
+        Route::get('rejected-attempts', [ReceptionistRejectedAttemptController::class, 'index']);
+        Route::post('manual-checkin', [ReceptionistManualCheckInController::class, 'store'])
+            ->middleware('throttle:manual-checkin');
         Route::patch('attendance/{logId}/assign-locker', [ReceptionistAttendanceController::class, 'assignLocker'])
             ->whereNumber('logId')
             ->middleware('throttle:assign-locker');
