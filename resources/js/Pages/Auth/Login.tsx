@@ -1,5 +1,6 @@
 import { Head } from '@inertiajs/react';
 import { FormEvent, useState } from 'react';
+import MemberHome from '../Member/Home';
 
 type Step = 'email' | 'code' | 'done';
 
@@ -7,7 +8,7 @@ interface ApiEnvelope {
     status: 'success' | 'error';
     message?: string;
     code?: string;
-    data?: { expires_in?: number };
+    data?: { expires_in?: number; access_token?: string };
 }
 
 async function postJson(path: string, body: Record<string, unknown>): Promise<{ ok: boolean; payload: ApiEnvelope }> {
@@ -27,6 +28,7 @@ export default function Login() {
     const [busy, setBusy] = useState(false);
     const [error, setError] = useState('');
     const [notice, setNotice] = useState('');
+    const [token, setToken] = useState('');
 
     async function requestOtp(event: FormEvent) {
         event.preventDefault();
@@ -53,8 +55,8 @@ export default function Login() {
             const { ok, payload } = await postJson('/api/v1/auth/verify-otp', { email, code });
 
             if (ok) {
+                setToken(payload.data?.access_token ?? '');
                 setStep('done');
-                setNotice('Login berhasil. Halaman beranda member menyusul.');
             } else {
                 setError(payload.message ?? 'Kode tidak cocok. Periksa lagi.');
             }
@@ -63,6 +65,10 @@ export default function Login() {
         } finally {
             setBusy(false);
         }
+    }
+
+    if (token !== '') {
+        return <MemberHome token={token} />;
     }
 
     return (
