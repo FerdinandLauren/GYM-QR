@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\V1\ReceptionistBatchResetController;
 use App\Http\Controllers\Api\V1\ReceptionistLockerController;
 use App\Http\Controllers\Api\V1\ReceptionistManualCheckInController;
 use App\Http\Controllers\Api\V1\ReceptionistMemberController;
+use App\Http\Controllers\Api\V1\ReceptionistPackageController;
 use App\Http\Controllers\Api\V1\ReceptionistMembershipController;
 use App\Http\Controllers\Api\V1\ReceptionistRejectedAttemptController;
 use App\Http\Controllers\Api\V1\ReceptionistSessionController;
@@ -47,6 +48,7 @@ Route::prefix('v1')->group(function (): void {
         Route::post('manual-checkin', [ReceptionistManualCheckInController::class, 'store'])
             ->middleware('throttle:manual-checkin');
         Route::post('memberships', [ReceptionistMembershipController::class, 'store']);
+        Route::get('packages', [ReceptionistPackageController::class, 'index']);
         Route::post('lockers/batch-reset', [ReceptionistBatchResetController::class, 'store']);
         Route::patch('attendance/{logId}/assign-locker', [ReceptionistAttendanceController::class, 'assignLocker'])
             ->whereNumber('logId')

@@ -1,6 +1,7 @@
 import { Head } from '@inertiajs/react';
 import { useCallback, useEffect, useState } from 'react';
 import { ApiError, sessionGet, sessionPatch } from '../../lib/api';
+import { CloseGymPanel, ManualCheckInPanel, SellPackagePanel } from './Panels';
 
 interface Session {
     log_id: number;
@@ -38,6 +39,7 @@ export default function CashierDashboard() {
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');
     const [online, setOnline] = useState(true);
+    const [panel, setPanel] = useState<'manual' | 'sell' | 'close' | null>(null);
 
     const refresh = useCallback(async () => {
         try {
@@ -91,6 +93,15 @@ export default function CashierDashboard() {
                     </span>
                     <button type="button" onClick={() => void refresh()} className="min-h-11 rounded-[8px] border border-[var(--line)] px-4 text-[13px] font-semibold">
                         Muat ulang
+                    </button>
+                    <button type="button" onClick={() => setPanel('manual')} className="min-h-11 rounded-[8px] bg-[var(--steel)] px-4 text-[13px] font-semibold text-white">
+                        Check-in manual
+                    </button>
+                    <button type="button" onClick={() => setPanel('sell')} className="min-h-11 rounded-[8px] bg-[var(--steel)] px-4 text-[13px] font-semibold text-white">
+                        Jual paket
+                    </button>
+                    <button type="button" onClick={() => setPanel('close')} className="min-h-11 rounded-[8px] border border-[var(--stop)] px-4 text-[13px] font-semibold text-[var(--stop)]">
+                        Tutup gym
                     </button>
                     <button
                         type="button"
@@ -234,6 +245,40 @@ export default function CashierDashboard() {
                         </div>
                     </section>
                 </div>
+
+                {panel === 'manual' && (
+                    <ManualCheckInPanel
+                        onClose={() => setPanel(null)}
+                        onDone={() => {
+                            setPanel(null);
+                            setMessage('Check-in manual tersimpan.');
+                            void refresh();
+                        }}
+                    />
+                )}
+
+                {panel === 'sell' && (
+                    <SellPackagePanel
+                        onClose={() => setPanel(null)}
+                        onDone={() => {
+                            setPanel(null);
+                            setMessage('Paket tersimpan.');
+                            void refresh();
+                        }}
+                    />
+                )}
+
+                {panel === 'close' && (
+                    <CloseGymPanel
+                        occupied={lockers.filter((locker) => locker.status === 'occupied').length}
+                        onClose={() => setPanel(null)}
+                        onDone={() => {
+                            setPanel(null);
+                            setMessage('Reset loker massal selesai.');
+                            void refresh();
+                        }}
+                    />
+                )}
             </main>
         </>
     );

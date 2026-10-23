@@ -76,3 +76,19 @@ export async function sessionPatch<T>(path: string, body: Record<string, unknown
 
     return payload.data as T;
 }
+export async function sessionPost<T>(path: string, body: Record<string, unknown> = {}, extraHeaders: Record<string, string> = {}): Promise<T> {
+    const response = await fetch(path, {
+        method: 'POST',
+        headers: { Accept: 'application/json', 'Content-Type': 'application/json', ...extraHeaders },
+        credentials: 'same-origin',
+        body: JSON.stringify(body),
+    });
+
+    const payload = await response.json();
+
+    if (!response.ok) {
+        throw payload as ApiError;
+    }
+
+    return payload.data as T;
+}

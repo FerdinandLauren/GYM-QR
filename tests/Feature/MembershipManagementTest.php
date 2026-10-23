@@ -186,4 +186,15 @@ class MembershipManagementTest extends TestCase
             ->assertStatus(400)
             ->assertJsonPath('code', 'VALIDATION_ERROR');
     }
-}
+
+    public function test_kasir_hanya_melihat_paket_aktif(): void
+    {
+        $this->createPackage(['code' => 'AKTIF-1', 'name' => 'Aktif']);
+        $inactive = $this->createPackage(['code' => 'NONAKTIF-1', 'name' => 'Nonaktif']);
+        DB::table('packages')->where('package_id', $inactive)->update(['is_active' => 0]);
+
+        $this->getJson('/api/v1/receptionist/packages')
+            ->assertOk()
+            ->assertJsonCount(1, 'data.packages')
+            ->assertJsonPath('data.packages.0.code', 'AKTIF-1');
+    }}
