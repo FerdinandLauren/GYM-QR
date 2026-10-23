@@ -1,11 +1,17 @@
 <?php
 
+use App\Http\Controllers\Api\V1\AdminAuditLogController;
+use App\Http\Controllers\Api\V1\AdminGymSettingsController;
+use App\Http\Controllers\Api\V1\AdminLockerController;
 use App\Http\Controllers\Api\V1\AdminMembershipController;
+use App\Http\Controllers\Api\V1\AdminPackageController;
+use App\Http\Controllers\Api\V1\AdminStaffController;
 use App\Http\Controllers\Api\V1\AttendanceController;
 use App\Http\Controllers\Api\V1\MemberAttendanceHistoryController;
 use App\Http\Controllers\Api\V1\MemberAuthController;
 use App\Http\Controllers\Api\V1\MemberProfileController;
 use App\Http\Controllers\Api\V1\ReceptionistAttendanceController;
+use App\Http\Controllers\Api\V1\ReceptionistBatchResetController;
 use App\Http\Controllers\Api\V1\ReceptionistLockerController;
 use App\Http\Controllers\Api\V1\ReceptionistManualCheckInController;
 use App\Http\Controllers\Api\V1\ReceptionistMemberController;
@@ -40,6 +46,7 @@ Route::prefix('v1')->group(function (): void {
         Route::post('manual-checkin', [ReceptionistManualCheckInController::class, 'store'])
             ->middleware('throttle:manual-checkin');
         Route::post('memberships', [ReceptionistMembershipController::class, 'store']);
+        Route::post('lockers/batch-reset', [ReceptionistBatchResetController::class, 'store']);
         Route::patch('attendance/{logId}/assign-locker', [ReceptionistAttendanceController::class, 'assignLocker'])
             ->whereNumber('logId')
             ->middleware('throttle:assign-locker');
@@ -54,5 +61,18 @@ Route::prefix('v1')->group(function (): void {
     Route::middleware(['auth:staff', 'role:admin'])->prefix('admin')->group(function (): void {
         Route::patch('memberships/{membershipId}', [AdminMembershipController::class, 'update'])
             ->whereNumber('membershipId');
+        Route::get('packages', [AdminPackageController::class, 'index']);
+        Route::post('packages', [AdminPackageController::class, 'store']);
+        Route::patch('packages/{packageId}', [AdminPackageController::class, 'update'])->whereNumber('packageId');
+        Route::get('lockers', [AdminLockerController::class, 'index']);
+        Route::post('lockers', [AdminLockerController::class, 'store']);
+        Route::patch('lockers/{lockerId}', [AdminLockerController::class, 'update'])->whereNumber('lockerId');
+        Route::get('gym-settings', [AdminGymSettingsController::class, 'show']);
+        Route::patch('gym-settings', [AdminGymSettingsController::class, 'update']);
+        Route::post('gym-settings/regenerate-qr', [AdminGymSettingsController::class, 'regenerateQr']);
+        Route::get('staff', [AdminStaffController::class, 'index']);
+        Route::post('staff', [AdminStaffController::class, 'store']);
+        Route::patch('staff/{userId}', [AdminStaffController::class, 'update'])->whereNumber('userId');
+        Route::get('audit-logs', [AdminAuditLogController::class, 'index']);
     });
 });
