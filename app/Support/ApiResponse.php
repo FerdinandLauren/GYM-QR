@@ -12,7 +12,7 @@ use stdClass;
 final class ApiResponse
 {
     /**
-     * @param  array<string, mixed>  $data
+     * @param  array<array-key, mixed>  $data
      * @param  array<string, mixed>  $meta
      */
     public static function success(string $message, array $data = [], int $status = 200, array $meta = []): JsonResponse

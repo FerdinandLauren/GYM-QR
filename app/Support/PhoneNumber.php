@@ -21,4 +21,15 @@ final class PhoneNumber
 
         return $digits;
     }
+
+    public static function mask(string $value): string
+    {
+        $digits = preg_replace('/\D+/', '', $value) ?? '';
+
+        if (strlen($digits) <= 8) {
+            return $digits;
+        }
+
+        return substr($digits, 0, 4).'****'.substr($digits, -4);
+    }
 }
