@@ -1,6 +1,9 @@
 import http from 'k6/http';
 import { check, sleep } from 'k6';
 
+// 409 SESSION_ACTIVE dianggap respons sah untuk uji beban endpoint.
+http.setResponseCallback(http.expectedStatuses(200, 409, 429));
+
 // Jalankan:
 //   php artisan load:prepare --members=50 --lockers=50
 //   $env:TOKENS = (Get-Content storage/app/load-tokens.txt) -join ','

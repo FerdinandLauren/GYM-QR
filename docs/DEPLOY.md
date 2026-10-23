@@ -79,7 +79,7 @@ Database harian penuh:
 $stamp = Get-Date -Format "yyyyMMdd-HHmm"
 & "C:\laragon\bin\mysql\mysql-8.4.3-winx64\bin\mysqldump.exe" `
   --user=gympass_qr_app --password=$env:DB_PASSWORD `
-  --single-transaction --routines --events gympass_qr `
+  --single-transaction --no-tablespaces --routines --events gympass_qr `
   | Out-File -Encoding utf8 "C:\backups\gympass-$stamp.sql"
 ```
 

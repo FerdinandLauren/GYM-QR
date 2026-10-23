@@ -63,8 +63,9 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('otp-verify', fn (Request $request) => Limit::perMinute(10)
             ->by('otp-verify:'.$this->emailKey($request).'|'.$request->ip()));
 
-        RateLimiter::for('scan-qr', fn (Request $request) => Limit::perMinute(10)
-            ->by('scan-qr:'.$this->actorKey($request)));
+        RateLimiter::for('scan-qr', fn (Request $request) => Limit::perMinute(
+            (int) env('RATE_LIMIT_SCAN_PER_MINUTE', 10)
+        )->by('scan-qr:'.$this->actorKey($request)));
 
         RateLimiter::for('assign-locker', fn (Request $request) => Limit::perMinute(30)
             ->by('assign-locker:'.$this->actorKey($request)));

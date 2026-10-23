@@ -70,3 +70,10 @@ Target: p95 `scan-qr` ≤ 1500 ms, error rate < 2%.
 - Kalibrasi `geofence_radius_m` dari hasil ukur.
 - Isi Q1–Q5 di PRD.
 - Siapkan backup harian + uji restore.
+
+## Hasil uji awal (lokal)
+
+- Backup: mysqldump berhasil, 10 tabel.
+- Restore drill: dump diimpor ke gympass_qr_restore, jumlah tabel dan baris users/ttendance_logs sama, lalu DB restore dihapus.
+- k6 di php artisan serve (dev, single-thread): 55 request, failed 0%, p95 2316 ms, avg 1278 ms. Angka ini bukan target produksi; jalankan ulang di belakang php-fpm/nginx atau Octane untuk mengukur K1.
+- Uji lokasi fisik dan kalibrasi radius belum dilakukan.
