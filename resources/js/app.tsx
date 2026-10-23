@@ -3,6 +3,9 @@ import '../css/app.css';
 import { createInertiaApp } from '@inertiajs/react';
 import type { ComponentType } from 'react';
 import { createRoot } from 'react-dom/client';
+import { applyStoredTheme } from './lib/theme';
+
+applyStoredTheme();
 
 type InertiaOptions = NonNullable<Parameters<typeof createInertiaApp>[0]>;
 type SetupOptions = Parameters<NonNullable<InertiaOptions['setup']>>[0];

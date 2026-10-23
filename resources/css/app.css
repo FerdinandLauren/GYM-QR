@@ -59,7 +59,7 @@
 /* §2.2 Warna mode gelap. Spec tidak menetapkan ulang ink-muted/hold/line,
    jadi token itu tetap memakai nilai mode terang. */
 @media (prefers-color-scheme: dark) {
-    :root {
+    :root:not([data-theme='light']) {
         --concrete: #0f1a24;
         --surface: #16242f;
         --ink: #e6ebef;
@@ -68,6 +68,19 @@
         --go: #4cc38a;
         --stop: #ff7a6b;
     }
+}
+
+/* Sakelar manual menang atas preferensi sistem. */
+:root[data-theme='dark'] {
+    --concrete: #0f1a24;
+    --surface: #16242f;
+    --ink: #e6ebef;
+    --ink-muted: #a8b6c2;
+    --steel: #7fb3c4;
+    --plate: #f4c20d;
+    --go: #4cc38a;
+    --stop: #ff7a6b;
+    --line: #2a3a47;
 }
 
 /* §2.5 Hormati preferensi sistem: ganti gerak dengan perubahan instan. */

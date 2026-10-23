@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import Scan from './Scan';
 import { apiGet, ApiError } from '../../lib/api';
+import { ThemeToggle } from '../../lib/theme';
 
 interface Membership {
     membership_id: number;
@@ -65,9 +66,12 @@ export default function MemberHome({ token }: { token: string }) {
 
     return (
         <main className="mx-auto min-h-screen w-full max-w-[560px] bg-[var(--concrete)] px-5 pt-8 pb-24">
-            <p className="font-[var(--font-display)] text-[12px] tracking-[0.18em] text-[var(--ink-muted)] uppercase">
-                GymPass QR
-            </p>
+            <div className="flex items-start justify-between gap-3">
+                <p className="font-[var(--font-display)] text-[12px] tracking-[0.18em] text-[var(--ink-muted)] uppercase">
+                    GymPass QR
+                </p>
+                <ThemeToggle />
+            </div>
             <h1 className="mt-1 font-[var(--font-display)] text-[var(--display-md-size)] leading-[var(--display-md-line)] font-bold">
                 Halo, {profile?.user.full_name ?? '...'}
             </h1>

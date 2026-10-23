@@ -2,6 +2,7 @@ import { Head } from '@inertiajs/react';
 import { useCallback, useEffect, useState } from 'react';
 import { ApiError, sessionGet, sessionPatch } from '../../lib/api';
 import { echo } from '../../lib/echo';
+import { ThemeToggle } from '../../lib/theme';
 import { CloseGymPanel, ManualCheckInPanel, RejectedPanel, SellPackagePanel } from './Panels';
 
 interface Session {
@@ -104,8 +105,10 @@ export default function CashierDashboard() {
                     <button type="button" onClick={() => setPanel('close')} className="min-h-11 rounded-[8px] border border-[var(--stop)] px-4 text-[13px] font-semibold text-[var(--stop)]">
                         Tutup gym
                     </button>
+                    <ThemeToggle />
                     <button
                         type="button"
+
                         onClick={async () => {
                             await fetch('/api/v1/receptionist/auth/logout', { method: 'POST', credentials: 'same-origin' });
                             window.location.assign('/kasir/login');

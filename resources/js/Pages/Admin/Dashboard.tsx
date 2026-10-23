@@ -1,6 +1,7 @@
 import { Head } from '@inertiajs/react';
 import { FormEvent, useCallback, useEffect, useState } from 'react';
 import { ApiError, sessionGet, sessionPatch, sessionPost } from '../../lib/api';
+import { ThemeToggle } from '../../lib/theme';
 
 type Tab = 'packages' | 'lockers' | 'settings' | 'staff' | 'reports' | 'audit';
 
@@ -35,7 +36,8 @@ export default function AdminDashboard() {
                 <header className="flex flex-wrap items-center gap-3 border-b border-[var(--line)] bg-[var(--surface)] px-5 py-3">
                     <p className="font-[var(--font-display)] text-[15px] font-bold tracking-[0.12em] uppercase">GymPass QR</p>
                     <span className="text-[13px] text-[var(--ink-muted)]">Admin</span>
-                    <a href="/kasir" className="ml-auto min-h-11 rounded-[8px] border border-[var(--line)] px-4 pt-3 text-[13px] font-semibold">
+                    <ThemeToggle className="ml-auto" />
+                    <a href="/kasir" className="min-h-11 rounded-[8px] border border-[var(--line)] px-4 pt-3 text-[13px] font-semibold">
                         Dasbor kasir
                     </a>
                 </header>
