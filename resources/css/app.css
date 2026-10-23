@@ -1,0 +1,81 @@
+@import 'tailwindcss';
+
+/*
+ * Design tokens — docs/GymPass-QR-Design-Spec.md §2.
+ * Dipakai apa adanya; jangan mengarang nilai baru.
+ */
+:root {
+    /* §2.1 Warna mode terang */
+    --concrete: #e9ecee;
+    --surface: #ffffff;
+    --ink: #172433;
+    --ink-muted: #4b5a68;
+    --steel: #2f5f70;
+    --plate: #f4c20d;
+    --go: #14794a;
+    --stop: #c23a2b;
+    --hold: #b7791f;
+    --line: #c9d0d6;
+
+    /* §2.3 Tipografi */
+    --font-display: 'Big Shoulders Display', 'Arial Narrow', sans-serif;
+    --font-sans: 'Figtree', system-ui, sans-serif;
+    --display-xl-size: 72px;
+    --display-xl-line: 72px;
+    --display-lg-size: 40px;
+    --display-lg-line: 44px;
+    --display-md-size: 28px;
+    --display-md-line: 32px;
+    --body-lg-size: 18px;
+    --body-lg-line: 28px;
+    --body-size: 16px;
+    --body-line: 24px;
+    --body-sm-size: 14px;
+    --body-sm-line: 20px;
+    --caption-size: 12px;
+    --caption-line: 16px;
+
+    /* §2.4 Jarak (kelipatan 4 px) dan sudut */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-6: 24px;
+    --space-8: 32px;
+    --space-12: 48px;
+    --space-16: 64px;
+    --radius-control: 8px;
+    --radius-panel: 12px;
+    --radius-locker: 4px;
+    --radius-pill: 9999px;
+
+    /* §2.5 Gerak */
+    --motion-fast: 120ms;
+    --motion-base: 220ms;
+    --motion-emphasis: 450ms;
+    --motion-ease: ease-out;
+}
+
+/* §2.2 Warna mode gelap. Spec tidak menetapkan ulang ink-muted/hold/line,
+   jadi token itu tetap memakai nilai mode terang. */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --concrete: #0f1a24;
+        --surface: #16242f;
+        --ink: #e6ebef;
+        --steel: #7fb3c4;
+        --plate: #f4c20d;
+        --go: #4cc38a;
+        --stop: #ff7a6b;
+    }
+}
+
+/* §2.5 Hormati preferensi sistem: ganti gerak dengan perubahan instan. */
+@media (prefers-reduced-motion: reduce) {
+    :root {
+        --motion-fast: 0ms;
+        --motion-base: 0ms;
+        --motion-emphasis: 0ms;
+    }
+}
+
