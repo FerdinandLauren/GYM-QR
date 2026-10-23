@@ -79,3 +79,20 @@
     }
 }
 
+
+@layer base {
+    html {
+        font-family: var(--font-sans);
+    }
+
+    body {
+        background: var(--concrete);
+        color: var(--ink);
+    }
+
+    :focus-visible {
+        outline: 3px solid var(--steel);
+        outline-offset: 2px;
+    }
+}
+

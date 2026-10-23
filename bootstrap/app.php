@@ -2,6 +2,7 @@
 
 use App\Exceptions\ApiErrorRenderer;
 use App\Http\Middleware\EnsureRole;
+use App\Http\Middleware\HandleInertiaRequests;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -25,6 +26,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->api(prepend: [
             EncryptCookies::class,
             StartSession::class,
+        ]);
+
+        $middleware->web(append: [
+            HandleInertiaRequests::class,
         ]);
 
         $middleware->alias([
