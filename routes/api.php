@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\V1\AdminGymSettingsController;
 use App\Http\Controllers\Api\V1\AdminLockerController;
 use App\Http\Controllers\Api\V1\AdminMembershipController;
 use App\Http\Controllers\Api\V1\AdminPackageController;
+use App\Http\Controllers\Api\V1\AdminReportController;
 use App\Http\Controllers\Api\V1\AdminStaffController;
 use App\Http\Controllers\Api\V1\AttendanceController;
 use App\Http\Controllers\Api\V1\MemberAttendanceHistoryController;
@@ -74,5 +75,7 @@ Route::prefix('v1')->group(function (): void {
         Route::post('staff', [AdminStaffController::class, 'store']);
         Route::patch('staff/{userId}', [AdminStaffController::class, 'update'])->whereNumber('userId');
         Route::get('audit-logs', [AdminAuditLogController::class, 'index']);
+        Route::get('reports/attendance', [AdminReportController::class, 'attendance']);
+        Route::get('reports/peak-hours', [AdminReportController::class, 'peakHours']);
     });
 });

@@ -8,7 +8,8 @@ Panduan operasi untuk agent coding di repo ini. Wajib dibaca sebelum menyentuh k
 - Stack: PHP 8.3 / Laravel 11 / MySQL 8.4.3 / Redis / Laravel Reverb.
 - Status PRD: **Draft for Review** (belum Development Ready). Decision Log §0.2 adalah keputusan yang mengikat; bagian lain bisa berubah setelah sign-off owner.
 - Remote: `https://github.com/FerdinandLauren/GYM-QR.git` (branch `main`).
-- Status: M0, M0.5, M1, M2, M3 selesai. Berikutnya: M4 (membership & admin), lalu M5 (UAT/hardening).
+- Status: M0–M5 (backend Phase 1) selesai. 118 test, PHPStan bersih, Pint bersih, `npm run build` sukses.
+- Deviasi tercatat: feed memakai Redis list (bukan Stream, klien Predis/Redis 5); `users.totp_secret` VARCHAR(512); Reverb terverifikasi start di Windows tanpa `pcntl`; UI member/kasir/admin belum dibuat (frontend masih provisional).
 - Dokumen di repo: `PRD-GymPass-QR-v1.2.md`, `docs/GymPass-QR-Design-Spec.md`, `AGENTS.md`.
 
 Urutan otoritas saat ada konflik:
