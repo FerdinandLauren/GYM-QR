@@ -31,6 +31,15 @@ final class CheckInService
      */
     public function scan(User $member, array $data): array
     {
+        $key = (string) $data['idempotency_key'];
+
+        // PRD §5.2 invariant 4: key yang sama mengembalikan respons tersimpan tanpa validasi ulang.
+        $replayed = $this->findByIdempotency($member->user_id, $key);
+
+        if ($replayed !== null) {
+            return $this->payload($member, $replayed);
+        }
+
         $settings = DB::table('gym_settings')->first();
 
         if ($settings === null) {
@@ -46,7 +55,6 @@ final class CheckInService
             (float) $data['accuracy'],
         );
 
-        $key = (string) $data['idempotency_key'];
         $lockerIntent = (string) ($data['locker_intent'] ?? 'no_locker');
 
         return $this->withCheckinLock($member->user_id, function () use ($member, $data, $key, $lockerIntent, $settings): array {

@@ -178,6 +178,30 @@ class CheckInScanTest extends TestCase
         $this->assertSame(1, DB::table('attendance_logs')->count());
     }
 
+    public function test_replay_dengan_qr_dan_koordinat_berbeda_tetap_200_tanpa_validasi_ulang(): void
+    {
+        $member = $this->member();
+        $this->createMembership($member);
+        $key = (string) Str::uuid();
+
+        $first = $this->postScan($member, $this->scanPayload(['locker_intent' => 'need_locker']), $key)
+            ->assertOk()
+            ->json('data');
+
+        // QR asing + koordinat 500 m + akurasi 500 m: semuanya akan ditolak bila divalidasi ulang.
+        $this->postScan($member, $this->scanPayload([
+            'qr_payload' => 'QR-SALAH',
+            'latitude' => $this->latitudeOffset(500.0),
+            'accuracy' => 500,
+        ]), $key)
+            ->assertOk()
+            ->assertJsonPath('data.log_id', $first['log_id'])
+            ->assertJsonPath('data.locker_state', 'pending');
+
+        $this->assertSame(1, DB::table('attendance_logs')->count());
+        $this->assertSame(0, DB::table('audit_logs')->where('action', 'attendance.scan_rejected')->count());
+    }
+
     public function test_idempotency_key_wajib_dikirim(): void
     {
         $member = $this->member();
