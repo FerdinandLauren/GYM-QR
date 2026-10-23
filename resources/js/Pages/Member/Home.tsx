@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import Scan from './Scan';
 import { apiGet, ApiError } from '../../lib/api';
 
 interface Membership {
@@ -31,13 +32,14 @@ interface HistoryRow {
     locker_number: string | null;
 }
 
-type Tab = 'home' | 'history';
+type Tab = 'home' | 'scan' | 'history';
 
 export default function MemberHome({ token }: { token: string }) {
     const [tab, setTab] = useState<Tab>('home');
     const [profile, setProfile] = useState<Profile | null>(null);
     const [history, setHistory] = useState<HistoryRow[]>([]);
     const [error, setError] = useState('');
+    const [refreshKey, setRefreshKey] = useState(0);
 
     useEffect(() => {
         let alive = true;
@@ -87,6 +89,16 @@ export default function MemberHome({ token }: { token: string }) {
                 </>
             )}
 
+            {tab === 'scan' && (
+                <Scan
+                    token={token}
+                    onDone={() => {
+                        setTab('home');
+                        setRefreshKey((key) => key + 1);
+                    }}
+                />
+            )}
+
             {tab === 'history' && (
                 <ul className="mt-6 space-y-3">
                     {history.length === 0 && (
@@ -104,8 +116,9 @@ export default function MemberHome({ token }: { token: string }) {
                 </ul>
             )}
 
-            <nav className="fixed inset-x-0 bottom-0 mx-auto flex w-full max-w-[560px] border-t border-[var(--line)] bg-[var(--surface)]">
+            <nav className="fixed inset-x-0 bottom-0 mx-auto flex w-full max-w-[560px] items-stretch border-t border-[var(--line)] bg-[var(--surface)]">
                 <TabButton active={tab === 'home'} onClick={() => setTab('home')}>Beranda</TabButton>
+                <TabButton active={tab === 'scan'} onClick={() => setTab('scan')}>Pindai</TabButton>
                 <TabButton active={tab === 'history'} onClick={() => setTab('history')}>Riwayat</TabButton>
             </nav>
         </main>
