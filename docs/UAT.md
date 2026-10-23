@@ -12,6 +12,12 @@ Checklist uji terima. Isi kolom bukti dengan output nyata, bukan asumsi.
 6. Buat akun uji: 1 admin, 1 kasir, 1 member aktif, 1 member expired, 1 Day Pass.
 7. Catat QR payload dari `gym_settings`.
 
+## Lokasi gym
+
+- Plus Code: J7MG+73, Tj. Senang, Kota Bandar Lampung, Lampung.
+- Koordinat tersimpan: -5.36681250, 105.27518750 (pusat sel Plus Code, akurasi ±14 m).
+- geofence_radius_m masih 30 m, belum dikalibrasi di lokasi.
+
 ## Acceptance Test
 
 | ID | Langkah | Hasil diharapkan | Bukti |
