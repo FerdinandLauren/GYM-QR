@@ -33,7 +33,7 @@ export default function StaffLogin() {
                 return;
             }
 
-            window.location.assign('/kasir');
+            window.location.assign(payload.data?.user?.role === 'admin' ? '/admin' : '/kasir');
         } catch {
             setError('Tidak bisa menghubungi server.');
             setBusy(false);

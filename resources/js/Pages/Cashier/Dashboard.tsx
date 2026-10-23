@@ -1,4 +1,4 @@
-import { Head } from '@inertiajs/react';
+import { Head, usePage } from '@inertiajs/react';
 import { useCallback, useEffect, useState } from 'react';
 import { ApiError, sessionGet, sessionPatch } from '../../lib/api';
 import { echo } from '../../lib/echo';
@@ -34,6 +34,9 @@ const FILTERS: Array<{ key: Filter; label: string }> = [
 ];
 
 export default function CashierDashboard() {
+    const page = usePage<{ auth: { user: { role: string } | null } }>();
+    const isAdmin = page.props.auth?.user?.role === 'admin';
+
     const [sessions, setSessions] = useState<Session[]>([]);
     const [lockers, setLockers] = useState<Locker[]>([]);
     const [filter, setFilter] = useState<Filter>('all');
@@ -105,6 +108,11 @@ export default function CashierDashboard() {
                     <button type="button" onClick={() => setPanel('close')} className="min-h-11 rounded-[8px] border border-[var(--stop)] px-4 text-[13px] font-semibold text-[var(--stop)]">
                         Tutup gym
                     </button>
+                    {isAdmin && (
+                        <a href="/admin" className="min-h-11 rounded-[8px] border border-[var(--steel)] px-4 pt-3 text-[13px] font-semibold text-[var(--steel)]">
+                            Panel admin
+                        </a>
+                    )}
                     <ThemeToggle />
                     <button
                         type="button"
