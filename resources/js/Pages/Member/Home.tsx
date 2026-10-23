@@ -60,7 +60,7 @@ export default function MemberHome({ token }: { token: string }) {
         }
 
         apiGet<HistoryRow[]>('/api/v1/member/attendance/history', token)
-            .then((data) => setHistory(data))
+            .then((data) => setHistory(Array.isArray(data) ? data : []))
             .catch((caught: ApiError) => setError(caught.message));
     }, [tab, token]);
 

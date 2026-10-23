@@ -34,7 +34,7 @@ final class StaffAuthController extends Controller
         if ($staff->role === 'admin') {
             $totpCode = (string) ($request->validated('totp_code') ?? '');
 
-            if ($staff->totp_secret === null || $totpCode === '' || ! $google2fa->verifyKey($staff->totp_secret, $totpCode)) {
+            if ($staff->totp_secret === null || $totpCode === '' || ! $google2fa->verifyKey((string) $staff->totp_secret, $totpCode, 2)) {
                 throw ApiException::unauthenticated('Kode TOTP tidak valid.');
             }
         }
