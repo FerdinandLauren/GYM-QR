@@ -342,3 +342,41 @@ function SubmitButton({ busy, onClick, children }: { busy: boolean; onClick: () 
         </button>
     );
 }
+
+interface Attempt {
+    audit_id: number;
+    full_name: string | null;
+    reason_code: string;
+    occurred_at: string;
+}
+
+export function RejectedPanel({ onClose }: { onClose: () => void }) {
+    const [attempts, setAttempts] = useState<Attempt[]>([]);
+    const [error, setError] = useState('');
+
+    useEffect(() => {
+        sessionGet<{ attempts: Attempt[] }>('/api/v1/receptionist/rejected-attempts')
+            .then((data) => setAttempts(data.attempts))
+            .catch((caught: ApiError) => setError(caught.message));
+    }, []);
+
+    return (
+        <Panel title="Scan ditolak" onClose={onClose}>
+            {error !== '' && <ErrorText error={error} />}
+            {attempts.length === 0 && error === '' && (
+                <p className="text-[13px] text-[var(--ink-muted)]">Tidak ada scan ditolak hari ini.</p>
+            )}
+            <ul className="space-y-2">
+                {attempts.map((row) => (
+                    <li key={row.audit_id} className="rounded-[8px] border border-[var(--line)] px-3 py-2 text-[13px]">
+                        <p className="font-semibold">{row.full_name ?? 'Member tidak dikenal'}</p>
+                        <p className="text-[12px] text-[var(--stop)]">{row.reason_code}</p>
+                        <p className="text-[11px] text-[var(--ink-muted)]">
+                            {new Date(row.occurred_at).toLocaleTimeString('id-ID', { timeZone: 'Asia/Jakarta', hour: '2-digit', minute: '2-digit' })} WIB
+                        </p>
+                    </li>
+                ))}
+            </ul>
+        </Panel>
+    );
+}

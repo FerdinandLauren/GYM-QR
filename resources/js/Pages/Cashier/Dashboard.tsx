@@ -1,7 +1,8 @@
 import { Head } from '@inertiajs/react';
 import { useCallback, useEffect, useState } from 'react';
 import { ApiError, sessionGet, sessionPatch } from '../../lib/api';
-import { CloseGymPanel, ManualCheckInPanel, SellPackagePanel } from './Panels';
+import { echo } from '../../lib/echo';
+import { CloseGymPanel, ManualCheckInPanel, RejectedPanel, SellPackagePanel } from './Panels';
 
 interface Session {
     log_id: number;
@@ -39,7 +40,7 @@ export default function CashierDashboard() {
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');
     const [online, setOnline] = useState(true);
-    const [panel, setPanel] = useState<'manual' | 'sell' | 'close' | null>(null);
+    const [panel, setPanel] = useState<'manual' | 'sell' | 'close' | 'rejected' | null>(null);
 
     const refresh = useCallback(async () => {
         try {
@@ -144,6 +145,13 @@ export default function CashierDashboard() {
                                     {item.label}
                                 </button>
                             ))}
+                            <button
+                                type="button"
+                                onClick={() => setPanel('rejected')}
+                                className="min-h-11 rounded-full border border-[var(--line)] px-4 text-[13px] font-semibold text-[var(--stop)]"
+                            >
+                                Scan ditolak
+                            </button>
                         </div>
 
                         <ul className="mt-4 space-y-3">
@@ -267,6 +275,8 @@ export default function CashierDashboard() {
                         }}
                     />
                 )}
+
+                {panel === 'rejected' && <RejectedPanel onClose={() => setPanel(null)} />}
 
                 {panel === 'close' && (
                     <CloseGymPanel
