@@ -4,8 +4,10 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Tests\Support\InteractsWithAuth;
 use Tests\Support\InteractsWithGym;
 use Tests\TestCase;
@@ -197,5 +199,18 @@ class MembershipManagementTest extends TestCase
             ->assertOk()
             ->assertJsonCount(1, 'data.packages')
             ->assertJsonPath('data.packages.0.code', 'AKTIF-1');
+    }
+
+    public function test_kasir_bisa_mengunggah_foto_member(): void
+    {
+        Storage::fake('public');
+
+        $response = $this->postJson('/api/v1/receptionist/members/photo', [
+            'photo' => UploadedFile::fake()->image('member.jpg'),
+        ]);
+
+        $response->assertCreated()->assertJsonPath('status', 'success');
+        $this->assertStringContainsString('/storage/members/', (string) $response->json('data.photo_url'));
+        $this->assertNotEmpty(Storage::disk('public')->files('members'));
     }
 }

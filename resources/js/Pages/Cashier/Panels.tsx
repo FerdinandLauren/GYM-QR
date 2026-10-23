@@ -230,8 +230,41 @@ export function SellPackagePanel({ onClose, onDone }: { onClose: () => void; onD
                     <Field label="Nama lengkap">
                         <input value={fullName} onChange={(event) => setFullName(event.target.value)} className="h-12 w-full rounded-[8px] border border-[var(--line)] px-3 text-[16px]" />
                     </Field>
-                    <Field label="URL foto">
-                        <input value={photoUrl} onChange={(event) => setPhotoUrl(event.target.value)} className="h-12 w-full rounded-[8px] border border-[var(--line)] px-3 text-[16px]" />
+                    <Field label="Foto member (wajib)">
+                        <input
+                            type="file"
+                            accept="image/jpeg,image/png,image/webp"
+                            onChange={(event) => {
+                                const file = event.target.files?.[0];
+
+                                if (!file) {
+                                    return;
+                                }
+
+                                const body = new FormData();
+                                body.append('photo', file);
+
+                                fetch('/api/v1/receptionist/members/photo', {
+                                    method: 'POST',
+                                    headers: { Accept: 'application/json' },
+                                    credentials: 'same-origin',
+                                    body,
+                                })
+                                    .then((response) => response.json())
+                                    .then((payload) => {
+                                        if (payload.status === 'success') {
+                                            setPhotoUrl(payload.data.photo_url);
+                                        } else {
+                                            setError(payload.message ?? 'Unggah foto gagal.');
+                                        }
+                                    })
+                                    .catch(() => setError('Unggah foto gagal.'));
+                            }}
+                            className="block w-full text-[13px]"
+                        />
+                        {photoUrl !== '' && (
+                            <img src={photoUrl} alt="Pratinjau foto member" className="mt-2 h-24 w-24 rounded-[8px] object-cover" />
+                        )}
                     </Field>
                 </>
             )}

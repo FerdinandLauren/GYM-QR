@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\V1\ReceptionistBatchResetController;
 use App\Http\Controllers\Api\V1\ReceptionistLockerController;
 use App\Http\Controllers\Api\V1\ReceptionistManualCheckInController;
 use App\Http\Controllers\Api\V1\ReceptionistMemberController;
+use App\Http\Controllers\Api\V1\ReceptionistMemberPhotoController;
 use App\Http\Controllers\Api\V1\ReceptionistMembershipController;
 use App\Http\Controllers\Api\V1\ReceptionistPackageController;
 use App\Http\Controllers\Api\V1\ReceptionistRejectedAttemptController;
@@ -44,6 +45,7 @@ Route::prefix('v1')->group(function (): void {
         Route::get('lockers', [ReceptionistLockerController::class, 'index']);
         Route::get('sessions', [ReceptionistSessionController::class, 'index']);
         Route::get('members', [ReceptionistMemberController::class, 'index']);
+        Route::post('members/photo', [ReceptionistMemberPhotoController::class, 'store']);
         Route::get('rejected-attempts', [ReceptionistRejectedAttemptController::class, 'index']);
         Route::post('manual-checkin', [ReceptionistManualCheckInController::class, 'store'])
             ->middleware('throttle:manual-checkin');
