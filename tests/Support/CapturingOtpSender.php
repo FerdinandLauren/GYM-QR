@@ -5,29 +5,29 @@ namespace Tests\Support;
 use App\Support\OtpSender;
 
 /**
- * Menangkap kode OTP di batas OtpSender supaya test bisa memverifikasi hash dan alur login.
+ * Test double: menyimpan kode terakhir per email tanpa mengirim apa pun.
  */
 final class CapturingOtpSender implements OtpSender
 {
-    /**
-     * @var array<string, list<string>>
-     */
-    public array $codes = [];
+    /** @var array<string, string> */
+    private array $codes = [];
 
-    public function send(string $phoneNumber, string $code): void
+    /** @var array<string, int> */
+    private array $counts = [];
+
+    public function send(string $email, string $code): void
     {
-        $this->codes[$phoneNumber][] = $code;
+        $this->codes[$email] = $code;
+        $this->counts[$email] = ($this->counts[$email] ?? 0) + 1;
     }
 
-    public function lastCodeFor(string $phoneNumber): string
+    public function lastCodeFor(string $email): string
     {
-        $codes = $this->codes[$phoneNumber] ?? [];
-
-        return $codes === [] ? '' : $codes[array_key_last($codes)];
+        return $this->codes[$email] ?? '';
     }
 
-    public function countFor(string $phoneNumber): int
+    public function countFor(string $email): int
     {
-        return count($this->codes[$phoneNumber] ?? []);
+        return $this->counts[$email] ?? 0;
     }
 }

@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 /**
- * Login member lewat OTP WhatsApp (FR-MEM-01) dan siklus refresh token (FR-MEM-10).
+ * Login member lewat OTP email (FR-MEM-01, pengganti WhatsApp) dan siklus refresh token.
  */
 final class MemberAuthService
 {
@@ -27,15 +27,15 @@ final class MemberAuthService
         private readonly OtpSender $sender,
     ) {}
 
-    public function requestOtp(string $phoneNumber, ?string $ipAddress): void
+    public function requestOtp(string $email, ?string $ipAddress): void
     {
-        // Nomor tidak terdaftar tetap mendapat respons sukses; tidak ada OTP yang dibuat.
-        if ($this->findMember($phoneNumber) === null) {
+        // Email tidak terdaftar tetap mendapat respons sukses; tidak ada OTP yang dibuat.
+        if ($this->findMember($email) === null) {
             return;
         }
 
         $lastRequest = DB::table('otp_requests')
-            ->where('phone_number', $phoneNumber)
+            ->where('email', $email)
             ->orderByDesc('otp_id')
             ->first();
 
@@ -47,7 +47,7 @@ final class MemberAuthService
         $packedIp = $ipAddress !== null ? inet_pton($ipAddress) : false;
 
         DB::table('otp_requests')->insert([
-            'phone_number' => $phoneNumber,
+            'email' => $email,
             'code_hash' => Hash::make($code),
             'attempts' => 0,
             'expires_at' => now()->addMinutes(self::OTP_TTL_MINUTES),
@@ -55,22 +55,22 @@ final class MemberAuthService
             'created_at' => now(),
         ]);
 
-        $this->sender->send($phoneNumber, $code);
+        $this->sender->send($email, $code);
     }
 
     /**
      * @return array{access_token: string, token_type: string, expires_in: int, refresh_token: string}
      */
-    public function verifyOtp(string $phoneNumber, string $code): array
+    public function verifyOtp(string $email, string $code): array
     {
-        $member = $this->findMember($phoneNumber);
+        $member = $this->findMember($email);
 
         if ($member === null) {
             throw ApiException::memberNotFound();
         }
 
         $otp = DB::table('otp_requests')
-            ->where('phone_number', $phoneNumber)
+            ->where('email', $email)
             ->whereNull('consumed_at')
             ->orderByDesc('otp_id')
             ->first();
@@ -164,10 +164,10 @@ final class MemberAuthService
         ];
     }
 
-    private function findMember(string $phoneNumber): ?User
+    private function findMember(string $email): ?User
     {
         return User::query()
-            ->where('phone_number', $phoneNumber)
+            ->where('email', $email)
             ->where('role', 'member')
             ->where('is_active', true)
             ->first();

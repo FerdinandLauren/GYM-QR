@@ -4,8 +4,8 @@ namespace App\Providers;
 
 use App\Auth\JwtGuard;
 use App\Support\AuditLogger;
+use App\Support\EmailOtpSender;
 use App\Support\JwtService;
-use App\Support\LogOtpSender;
 use App\Support\OtpSender;
 use App\Support\PhoneNumber;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -24,7 +24,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->bind(OtpSender::class, LogOtpSender::class);
+        $this->app->bind(OtpSender::class, EmailOtpSender::class);
         $this->app->singleton(AuditLogger::class);
     }
 
@@ -56,12 +56,12 @@ class AppServiceProvider extends ServiceProvider
     private function configureRateLimiters(): void
     {
         RateLimiter::for('otp-request', fn (Request $request) => [
-            Limit::perHour(5)->by('otp-phone:'.$this->phoneKey($request)),
+            Limit::perHour(5)->by('otp-email:'.$this->emailKey($request)),
             Limit::perHour(20)->by('otp-ip:'.$request->ip()),
         ]);
 
         RateLimiter::for('otp-verify', fn (Request $request) => Limit::perMinute(10)
-            ->by('otp-verify:'.$this->phoneKey($request).'|'.$request->ip()));
+            ->by('otp-verify:'.$this->emailKey($request).'|'.$request->ip()));
 
         RateLimiter::for('scan-qr', fn (Request $request) => Limit::perMinute(10)
             ->by('scan-qr:'.$this->actorKey($request)));
@@ -76,6 +76,13 @@ class AppServiceProvider extends ServiceProvider
             Limit::perMinutes(15, 5)->by('staff-login-account:'.$this->phoneKey($request)),
             Limit::perMinutes(15, 5)->by('staff-login-ip:'.$request->ip()),
         ]);
+    }
+
+    private function emailKey(Request $request): string
+    {
+        $email = $request->input('email');
+
+        return is_string($email) && $email !== '' ? mb_strtolower($email) : (string) $request->ip();
     }
 
     private function phoneKey(Request $request): string

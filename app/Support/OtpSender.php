@@ -3,9 +3,9 @@
 namespace App\Support;
 
 /**
- * Batas pengiriman OTP. Implementasi nyata menunggu keputusan Q2 (penyedia WhatsApp).
+ * Batas pengiriman OTP. Kanal: email (keputusan owner, menggantikan WhatsApp).
  */
 interface OtpSender
 {
-    public function send(string $phoneNumber, string $code): void;
+    public function send(string $email, string $code): void;
 }

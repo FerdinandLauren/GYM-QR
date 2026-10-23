@@ -10,7 +10,6 @@ use App\Http\Requests\VerifyOtpRequest;
 use App\Models\User;
 use App\Services\MemberAuthService;
 use App\Support\ApiResponse;
-use App\Support\PhoneNumber;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -22,17 +21,17 @@ final class MemberAuthController extends Controller
     public function requestOtp(RequestOtpRequest $request, MemberAuthService $service): JsonResponse
     {
         $service->requestOtp(
-            PhoneNumber::normalize((string) $request->validated('phone_number')),
+            (string) $request->validated('email'),
             $request->ip(),
         );
 
-        return ApiResponse::success('Kode OTP telah dikirim ke WhatsApp Anda.', ['expires_in' => 300]);
+        return ApiResponse::success('Kode OTP telah dikirim ke email Anda.', ['expires_in' => 300]);
     }
 
     public function verifyOtp(VerifyOtpRequest $request, MemberAuthService $service): JsonResponse
     {
         $tokens = $service->verifyOtp(
-            PhoneNumber::normalize((string) $request->validated('phone_number')),
+            (string) $request->validated('email'),
             (string) $request->validated('code'),
         );
 

@@ -19,20 +19,20 @@ class MemberOtpTest extends TestCase
     public function test_request_otp_menyimpan_hash_bukan_plaintext(): void
     {
         $sender = $this->fakeOtpSender();
-        User::factory()->create(['phone_number' => '628123456789']);
+        User::factory()->create(['email' => 'john@example.com']);
 
-        $response = $this->postJson('/api/v1/auth/request-otp', ['phone_number' => '08123456789']);
+        $response = $this->postJson('/api/v1/auth/request-otp', ['email' => 'john@example.com']);
 
         $response->assertOk()
             ->assertJsonPath('status', 'success')
             ->assertJsonPath('data.expires_in', 300)
             ->assertJsonMissingPath('data.code');
 
-        $row = DB::table('otp_requests')->where('phone_number', '628123456789')->first();
+        $row = DB::table('otp_requests')->where('email', 'john@example.com')->first();
 
         $this->assertNotNull($row);
-        $this->assertNotSame($sender->lastCodeFor('628123456789'), $row->code_hash);
-        $this->assertTrue(Hash::check($sender->lastCodeFor('628123456789'), $row->code_hash));
+        $this->assertNotSame($sender->lastCodeFor('john@example.com'), $row->code_hash);
+        $this->assertTrue(Hash::check($sender->lastCodeFor('john@example.com'), $row->code_hash));
         $this->assertSame(0, (int) $row->attempts);
         $this->assertTrue(Carbon::parse($row->expires_at)->between(
             now()->addMinutes(4)->addSeconds(50),
@@ -40,16 +40,16 @@ class MemberOtpTest extends TestCase
         ));
     }
 
-    public function test_request_otp_memberi_respons_seragam_untuk_nomor_terdaftar_dan_tidak(): void
+    public function test_request_otp_memberi_respons_seragam_untuk_email_terdaftar_dan_tidak(): void
     {
         $this->fakeOtpSender();
-        User::factory()->create(['phone_number' => '628111111111']);
+        User::factory()->create(['email' => 'a@example.com']);
 
-        $registered = $this->postJson('/api/v1/auth/request-otp', ['phone_number' => '628111111111'])
+        $registered = $this->postJson('/api/v1/auth/request-otp', ['email' => 'a@example.com'])
             ->assertOk()
             ->json();
 
-        $unknown = $this->postJson('/api/v1/auth/request-otp', ['phone_number' => '628999999999'])
+        $unknown = $this->postJson('/api/v1/auth/request-otp', ['email' => 'unknown@example.com'])
             ->assertOk()
             ->json();
 
@@ -62,19 +62,19 @@ class MemberOtpTest extends TestCase
     public function test_request_otp_menahan_kirim_ulang_dalam_60_detik(): void
     {
         $sender = $this->fakeOtpSender();
-        User::factory()->create(['phone_number' => '628123456789']);
+        User::factory()->create(['email' => 'john@example.com']);
 
-        $this->requestOtpFor('628123456789');
-        $this->requestOtpFor('628123456789');
+        $this->requestOtpFor('john@example.com');
+        $this->requestOtpFor('john@example.com');
 
-        $this->assertSame(1, $sender->countFor('628123456789'));
+        $this->assertSame(1, $sender->countFor('john@example.com'));
         $this->assertSame(1, DB::table('otp_requests')->count());
     }
 
     public function test_verify_otp_mengeluarkan_access_dan_refresh_token(): void
     {
         $this->fakeOtpSender();
-        $member = User::factory()->create(['phone_number' => '628123456789']);
+        $member = User::factory()->create(['email' => 'john@example.com']);
 
         $data = $this->loginTokensFor($member);
 
@@ -100,11 +100,11 @@ class MemberOtpTest extends TestCase
     public function test_verify_otp_kode_salah_lima_kali_menolak_kode_benar(): void
     {
         $this->fakeOtpSender();
-        User::factory()->create(['phone_number' => '628123456789']);
-        $this->requestOtpFor('628123456789');
+        User::factory()->create(['email' => 'john@example.com']);
+        $this->requestOtpFor('john@example.com');
 
         for ($attempt = 1; $attempt <= 5; $attempt++) {
-            $this->postJson('/api/v1/auth/verify-otp', ['phone_number' => '628123456789', 'code' => '000000'])
+            $this->postJson('/api/v1/auth/verify-otp', ['email' => 'john@example.com', 'code' => '000000'])
                 ->assertStatus(422)
                 ->assertJsonPath('code', 'OTP_INVALID');
         }
@@ -112,8 +112,8 @@ class MemberOtpTest extends TestCase
         $this->assertSame(5, (int) DB::table('otp_requests')->value('attempts'));
 
         $this->postJson('/api/v1/auth/verify-otp', [
-            'phone_number' => '628123456789',
-            'code' => $this->otpSender->lastCodeFor('628123456789'),
+            'email' => 'john@example.com',
+            'code' => $this->otpSender->lastCodeFor('john@example.com'),
         ])
             ->assertStatus(422)
             ->assertJsonPath('code', 'OTP_INVALID');
@@ -124,39 +124,39 @@ class MemberOtpTest extends TestCase
     public function test_verify_otp_kedaluwarsa_setelah_lima_menit(): void
     {
         $this->fakeOtpSender();
-        User::factory()->create(['phone_number' => '628123456789']);
-        $this->requestOtpFor('628123456789');
+        User::factory()->create(['email' => 'john@example.com']);
+        $this->requestOtpFor('john@example.com');
 
         $this->travel(6)->minutes();
 
         $this->postJson('/api/v1/auth/verify-otp', [
-            'phone_number' => '628123456789',
-            'code' => $this->otpSender->lastCodeFor('628123456789'),
+            'email' => 'john@example.com',
+            'code' => $this->otpSender->lastCodeFor('john@example.com'),
         ])
             ->assertStatus(422)
             ->assertJsonPath('code', 'OTP_EXPIRED');
     }
 
-    public function test_verify_otp_nomor_belum_terdaftar_menolak(): void
+    public function test_verify_otp_email_belum_terdaftar_menolak(): void
     {
         $this->fakeOtpSender();
 
-        $this->postJson('/api/v1/auth/verify-otp', ['phone_number' => '628999999999', 'code' => '123456'])
+        $this->postJson('/api/v1/auth/verify-otp', ['email' => 'unknown@example.com', 'code' => '123456'])
             ->assertStatus(404)
             ->assertJsonPath('code', 'MEMBER_NOT_FOUND')
             ->assertJsonPath('status', 'error');
     }
 
-    public function test_rate_limit_request_otp_per_nomor(): void
+    public function test_rate_limit_request_otp_per_email(): void
     {
         $this->fakeOtpSender();
-        User::factory()->create(['phone_number' => '628123456789']);
+        User::factory()->create(['email' => 'john@example.com']);
 
         for ($attempt = 1; $attempt <= 5; $attempt++) {
-            $this->requestOtpFor('628123456789');
+            $this->requestOtpFor('john@example.com');
         }
 
-        $this->postJson('/api/v1/auth/request-otp', ['phone_number' => '628123456789'])
+        $this->postJson('/api/v1/auth/request-otp', ['email' => 'john@example.com'])
             ->assertStatus(429)
             ->assertJsonPath('code', 'OTP_RATE_LIMITED')
             ->assertJsonStructure(['meta' => ['details' => ['retry_after_seconds']]]);
@@ -167,11 +167,11 @@ class MemberOtpTest extends TestCase
         $this->fakeOtpSender();
 
         for ($attempt = 1; $attempt <= 20; $attempt++) {
-            $this->postJson('/api/v1/auth/request-otp', ['phone_number' => sprintf('628100%06d', $attempt)])
+            $this->postJson('/api/v1/auth/request-otp', ['email' => sprintf('user%06d@example.com', $attempt)])
                 ->assertOk();
         }
 
-        $this->postJson('/api/v1/auth/request-otp', ['phone_number' => '628100999999'])
+        $this->postJson('/api/v1/auth/request-otp', ['email' => '628100999999'])
             ->assertStatus(429)
             ->assertJsonPath('code', 'OTP_RATE_LIMITED');
     }

@@ -18,6 +18,7 @@ class UserFactory extends Factory
         return [
             'full_name' => fake()->name(),
             'phone_number' => fake()->unique()->numerify('628##########'),
+            'email' => fake()->unique()->safeEmail(),
             'role' => 'member',
             'password_hash' => null,
             'is_active' => true,

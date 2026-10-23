@@ -27,7 +27,8 @@ class UserFactoryTest extends TestCase
             'password_hash' => null,
         ]);
 
-        $this->assertFalse(Schema::hasColumn('users', 'email'));
+        $this->assertTrue(Schema::hasColumn('users', 'email'));
+        $this->assertNotNull($user->email);
         $this->assertFalse(Schema::hasColumn('users', 'password'));
         $this->assertFalse(Schema::hasColumn('users', 'remember_token'));
     }

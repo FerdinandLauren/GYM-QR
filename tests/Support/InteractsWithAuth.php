@@ -25,9 +25,9 @@ trait InteractsWithAuth
         return User::factory()->create($attributes + ['role' => 'member']);
     }
 
-    protected function requestOtpFor(string $phoneNumber): void
+    protected function requestOtpFor(string $email): void
     {
-        $this->postJson('/api/v1/auth/request-otp', ['phone_number' => $phoneNumber])->assertOk();
+        $this->postJson('/api/v1/auth/request-otp', ['email' => $email])->assertOk();
     }
 
     /**
@@ -35,11 +35,11 @@ trait InteractsWithAuth
      */
     protected function loginTokensFor(User $member): array
     {
-        $this->requestOtpFor($member->phone_number);
-        $code = $this->otpSender->lastCodeFor($member->phone_number);
+        $this->requestOtpFor((string) $member->email);
+        $code = $this->otpSender->lastCodeFor((string) $member->email);
 
         return $this->postJson('/api/v1/auth/verify-otp', [
-            'phone_number' => $member->phone_number,
+            'email' => $member->email,
             'code' => $code,
         ])->assertOk()->json('data');
     }

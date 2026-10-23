@@ -15,6 +15,7 @@ use Illuminate\Support\Carbon;
  * @property int $user_id
  * @property string $full_name
  * @property string $phone_number
+ * @property string|null $email
  * @property string|null $photo_url
  * @property string $role
  * @property string|null $password_hash
