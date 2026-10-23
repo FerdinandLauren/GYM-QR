@@ -7,7 +7,9 @@ Panduan operasi untuk agent coding di repo ini. Wajib dibaca sebelum menyentuh k
 - Produk: GymPass QR — absensi gym + manajemen loker, satu lokasi, Phase 1.
 - Stack: PHP 8.3 / Laravel 11 / MySQL 8.4.3 / Redis / Laravel Reverb.
 - Status PRD: **Draft for Review** (belum Development Ready). Decision Log §0.2 adalah keputusan yang mengikat; bagian lain bisa berubah setelah sign-off owner.
-- Isi repo saat ini: `PRD-GymPass-QR-v1.2.md`, `docs/GymPass-QR-Design-Spec.md`. Belum ada kode, belum ada git.
+- Remote: `https://github.com/FerdinandLauren/GYM-QR.git` (branch `main`).
+- Status: M0 selesai (scaffold Laravel 11, 9 migrasi PRD §6.1, Tailwind + token desain, 2 test). Milestone berikutnya: M1 auth.
+- Dokumen di repo: `PRD-GymPass-QR-v1.2.md`, `docs/GymPass-QR-Design-Spec.md`, `AGENTS.md`.
 
 Urutan otoritas saat ada konflik:
 
@@ -174,6 +176,38 @@ Token desain dari design spec (pakai persis, jangan mengarang warna baru):
 7. Lapor: hasil, bukti, yang dilewati, risiko.
 
 Jangan commit kecuali diminta. Jangan force-push. Jangan ubah config git.
+
+## 9a. Git & milestone
+
+Remote: `https://github.com/FerdinandLauren/GYM-QR.git`, branch `main`.
+
+Sekali di awal repo (sudah dilakukan):
+
+```
+git init -b main
+git remote add origin https://github.com/FerdinandLauren/GYM-QR.git
+```
+
+Aturan commit:
+
+- **Satu commit per milestone.** Jangan campur dua milestone dalam satu commit.
+- Sebelum commit: `git status` dan `git diff` untuk memastikan hanya file yang dimaksud yang masuk.
+- Pesan commit: `feat(M1): auth staf + OTP member`, `fix(M2): geofence salah hitung`, `chore: baseline M0`.
+- Tag titik stabil setelah milestone lolos verifikasi: `git tag m0`, `git tag m1`, lalu `git push origin main --tags`.
+- Push ke `origin main` setelah user meminta. Jangan push tanpa diminta.
+- Jangan pernah commit: `.env`, `.env.*` selain `.env.example`, `storage/*.key`, `vendor/`, `node_modules/`, `public/build`, dump DB, log, atau kredensial.
+- `.gitignore` Laravel standar wajib memuat: `vendor/`, `node_modules/`, `.env`, `storage/*.key`, `public/build`, `.phpunit.result.cache`.
+- Jangan menulis ulang history, jangan `--amend` commit yang sudah di-push, jangan `reset --hard` pada commit yang sudah di-push.
+
+Alur per milestone:
+
+1. Selesaikan implementasi + verifikasi (test, lint, build).
+2. `git status` → `git diff` → review.
+3. Commit dengan pesan berpola.
+4. Push hanya bila user minta.
+5. Tag bila milestone dinyatakan stabil.
+
+Jika repo belum punya git, sebutkan dan minta izin sebelum `git init`.
 
 ## 10. Larangan
 
