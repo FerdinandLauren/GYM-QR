@@ -21,7 +21,7 @@ export default function StaffLogin() {
                 body: JSON.stringify({
                     phone_number: phone,
                     password,
-                    totp_code: totp === '' ? undefined : totp,
+                    totp_code: totp.replace(/\s+/g, '') === '' ? undefined : totp.replace(/\s+/g, ''),
                 }),
             });
             const payload = await response.json();
@@ -81,12 +81,19 @@ export default function StaffLogin() {
                     <label className="mt-3 block">
                         <span className="mb-1 block text-[13px] font-semibold">Kode TOTP (admin)</span>
                         <input
+                            type="text"
+                            name="totp_code"
                             inputMode="numeric"
+                            autoComplete="one-time-code"
                             maxLength={6}
                             value={totp}
-                            onChange={(event) => setTotp(event.target.value.replace(/\D/g, ''))}
-                            placeholder="Opsional untuk kasir"
-                            className="h-12 w-full rounded-[8px] border border-[var(--line)] bg-[var(--surface)] px-3 text-[16px]"
+                            onChange={(event) => setTotp(event.target.value)}
+                            onPaste={(event) => {
+                                event.preventDefault();
+                                setTotp(event.clipboardData.getData('text').slice(0, 6));
+                            }}
+                            placeholder="6 digit untuk admin"
+                            className="h-12 w-full rounded-[8px] border border-[var(--line)] bg-[var(--surface)] px-3 text-[16px] tracking-[0.3em]"
                         />
                     </label>
 
