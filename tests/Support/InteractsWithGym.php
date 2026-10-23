@@ -101,11 +101,11 @@ trait InteractsWithGym
         ]);
     }
 
-    protected function createLocker(string $number): int
+    protected function createLocker(string $number, string $status = 'occupied'): int
     {
         return DB::table('lockers')->insertGetId([
             'locker_number' => $number,
-            'status' => 'occupied',
+            'status' => $status,
         ]);
     }
 

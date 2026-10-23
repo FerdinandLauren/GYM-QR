@@ -4,6 +4,9 @@ use App\Http\Controllers\Api\V1\AttendanceController;
 use App\Http\Controllers\Api\V1\MemberAttendanceHistoryController;
 use App\Http\Controllers\Api\V1\MemberAuthController;
 use App\Http\Controllers\Api\V1\MemberProfileController;
+use App\Http\Controllers\Api\V1\ReceptionistAttendanceController;
+use App\Http\Controllers\Api\V1\ReceptionistLockerController;
+use App\Http\Controllers\Api\V1\ReceptionistSessionController;
 use App\Http\Controllers\Api\V1\StaffAuthController;
 use Illuminate\Support\Facades\Route;
 
@@ -23,4 +26,18 @@ Route::prefix('v1')->group(function (): void {
     Route::post('receptionist/auth/login', [StaffAuthController::class, 'login'])->middleware('throttle:staff-login');
     Route::post('receptionist/auth/logout', [StaffAuthController::class, 'logout'])
         ->middleware(['auth:staff', 'role:receptionist,admin']);
+
+    Route::middleware(['auth:staff', 'role:receptionist,admin'])->prefix('receptionist')->group(function (): void {
+        Route::get('lockers', [ReceptionistLockerController::class, 'index']);
+        Route::get('sessions', [ReceptionistSessionController::class, 'index']);
+        Route::patch('attendance/{logId}/assign-locker', [ReceptionistAttendanceController::class, 'assignLocker'])
+            ->whereNumber('logId')
+            ->middleware('throttle:assign-locker');
+        Route::patch('attendance/{logId}/release-locker', [ReceptionistAttendanceController::class, 'releaseLocker'])
+            ->whereNumber('logId');
+        Route::patch('attendance/{logId}/no-locker', [ReceptionistAttendanceController::class, 'noLocker'])
+            ->whereNumber('logId');
+        Route::patch('attendance/{logId}/verify-identity', [ReceptionistAttendanceController::class, 'verifyIdentity'])
+            ->whereNumber('logId');
+    });
 });

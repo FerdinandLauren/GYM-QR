@@ -111,4 +111,29 @@ final class ApiException extends RuntimeException
     {
         return new self('Layanan check-in sedang tidak tersedia. Silakan check-in manual ke kasir.', 503, 'SERVICE_UNAVAILABLE');
     }
+
+    public static function notFound(string $message = 'Data yang diminta tidak ditemukan.'): self
+    {
+        return new self($message, 404, 'NOT_FOUND');
+    }
+
+    public static function validationError(string $message): self
+    {
+        return new self($message, 400, 'VALIDATION_ERROR');
+    }
+
+    public static function lockerTaken(): self
+    {
+        return new self('Loker baru saja dipakai kasir lain. Pilih loker lain.', 409, 'LOCKER_TAKEN');
+    }
+
+    public static function lockerAlreadyAssigned(): self
+    {
+        return new self('Sesi ini sudah memiliki loker.', 409, 'LOCKER_ALREADY_ASSIGNED');
+    }
+
+    public static function sessionClosed(): self
+    {
+        return new self('Sesi kunjungan sudah ditutup.', 409, 'SESSION_CLOSED');
+    }
 }

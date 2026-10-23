@@ -108,7 +108,7 @@ npm run build
 3. **Satu sesi terbuka per member.** Scan saat ada sesi `checkout_time IS NULL` → `409 SESSION_ACTIVE`. Guard re-scan 5 menit → `429 RESCAN_GUARD`. Keputusan memakai jam server.
 4. **Idempotensi.** `Idempotency-Key` wajib untuk `scan-qr` dan `manual-checkin`. Key sama dalam 10 menit mengembalikan respons sukses yang sama tanpa baris baru.
 5. **Check-in atomic.** Transaksi + `SELECT ... FOR UPDATE` pada baris absensi user + lock Redis `checkin:{user_id}` TTL 10 detik.
-6. **Assign loker atomic.** Kunci baris sesi, lalu `UPDATE lockers SET status='occupied' WHERE locker_id=? AND status='available'`. `affected_rows = 0` → rollback + `409 LOCKER_TAKEN`. Sesi yang sudah punya loker → `409 LOCKER_ALREADY_ASSIGNED`.
+6. **Assign loker atomic.** Dalam satu transaksi: kunci baris loker `FOR UPDATE`, tolak jika status bukan `available`, kunci baris sesi, lalu `UPDATE lockers SET status='occupied' WHERE locker_id=? AND status='available'`. `affected_rows = 0` → rollback + `409 LOCKER_TAKEN`. Sesi yang sudah punya loker → `409 LOCKER_ALREADY_ASSIGNED`. Urutan kunci: loker lebih dulu, lalu sesi (menghindari deadlock dan membuat AT-08 deterministik).
 7. **Kembalikan kunci idempoten.** Klik kedua → 200 `already_returned: true`, timestamp pertama tidak ditimpa.
 8. **Membership.** `effective_status` dihitung saat request (cancelled/suspended menang; lalu expired; selain itu active). Kolom `status` hanya hasil job, bukan sumber keputusan check-in.
 9. **Prioritas membership.** `single_visit` aktif hari ini → `monthly_unlimited` dengan `end_date` terdekat → `403 MEMBERSHIP_EXPIRED`.
