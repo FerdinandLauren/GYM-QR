@@ -368,6 +368,21 @@ function StaffSection({ notify, fail }: { notify: Notice; fail: Failure }) {
         }
     }
 
+    async function resetPassword(row: StaffRow) {
+        const password = window.prompt(`Password baru untuk ${row.full_name} (min. 8 karakter):`);
+
+        if (password === null || password.length < 8) {
+            return;
+        }
+
+        try {
+            await sessionPatch(`/api/v1/admin/staff/${row.user_id}`, { password });
+            notify('Password staf direset.');
+        } catch (caught) {
+            fail(caught);
+        }
+    }
+
     return (
         <section className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
             <Table headers={['Nama', 'Nomor HP', 'Role', 'Status', '']}>
@@ -378,7 +393,10 @@ function StaffSection({ notify, fail }: { notify: Notice; fail: Failure }) {
                         <Cell>{row.role}</Cell>
                         <Cell>{row.is_active ? 'Aktif' : 'Nonaktif'}</Cell>
                         <Cell>
-                            <SmallButton onClick={() => void toggle(row)}>{row.is_active ? 'Nonaktifkan' : 'Aktifkan'}</SmallButton>
+                            <div className="flex gap-2">
+                                <SmallButton onClick={() => void toggle(row)}>{row.is_active ? 'Nonaktifkan' : 'Aktifkan'}</SmallButton>
+                                <SmallButton onClick={() => void resetPassword(row)}>Reset password</SmallButton>
+                            </div>
                         </Cell>
                     </tr>
                 ))}

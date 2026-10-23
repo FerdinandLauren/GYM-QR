@@ -1,6 +1,7 @@
 import { Head } from '@inertiajs/react';
 import { FormEvent, useState } from 'react';
 import MemberHome from '../Member/Home';
+import { setTokens } from '../../lib/auth';
 
 type Step = 'email' | 'code' | 'done';
 
@@ -8,7 +9,7 @@ interface ApiEnvelope {
     status: 'success' | 'error';
     message?: string;
     code?: string;
-    data?: { expires_in?: number; access_token?: string };
+    data?: { expires_in?: number; access_token?: string; refresh_token?: string };
 }
 
 async function postJson(path: string, body: Record<string, unknown>): Promise<{ ok: boolean; payload: ApiEnvelope }> {
@@ -55,6 +56,7 @@ export default function Login() {
             const { ok, payload } = await postJson('/api/v1/auth/verify-otp', { email, code });
 
             if (ok) {
+                setTokens(payload.data?.access_token ?? '', payload.data?.refresh_token ?? '');
                 setToken(payload.data?.access_token ?? '');
                 setStep('done');
             } else {

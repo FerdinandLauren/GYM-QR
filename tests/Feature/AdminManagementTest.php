@@ -183,4 +183,15 @@ class AdminManagementTest extends TestCase
             ->assertStatus(403)
             ->assertJsonPath('code', 'FORBIDDEN_ROLE');
     }
+
+    public function test_admin_mereset_password_staf(): void
+    {
+        $staff = User::factory()->create(['role' => 'receptionist', 'phone_number' => '628111111111']);
+
+        $this->patchJson("/api/v1/admin/staff/{$staff->user_id}", ['password' => 'password-baru'])
+            ->assertOk();
+
+        $hash = (string) DB::table('users')->where('user_id', $staff->user_id)->value('password_hash');
+        $this->assertTrue(password_verify('password-baru', $hash));
+    }
 }
