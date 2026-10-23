@@ -197,4 +197,5 @@ class MembershipManagementTest extends TestCase
             ->assertOk()
             ->assertJsonCount(1, 'data.packages')
             ->assertJsonPath('data.packages.0.code', 'AKTIF-1');
-    }}
+    }
+}
