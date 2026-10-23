@@ -56,6 +56,12 @@ final class ApiErrorRenderer
     private function describe(Throwable $e, Request $request): array
     {
         return match (true) {
+            $e instanceof ApiException => [
+                $e->status,
+                $e->errorCode,
+                $e->getMessage(),
+                $e->details,
+            ],
             $e instanceof ValidationException => [
                 400,
                 'VALIDATION_ERROR',

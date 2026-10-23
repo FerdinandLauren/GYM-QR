@@ -28,6 +28,10 @@
         <env name="PULSE_ENABLED" value="false"/>
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="SESSION_DRIVER" value="array"/>
+        <env name="SESSION_LIFETIME" value="480"/>
+        <env name="SESSION_SECURE_COOKIE" value="true"/>
+        <env name="SESSION_SAME_SITE" value="strict"/>
+        <env name="SESSION_HTTP_ONLY" value="true"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
     </php>
 </phpunit>
