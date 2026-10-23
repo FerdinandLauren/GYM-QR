@@ -6,8 +6,8 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Data awal lokal. Koordinat, jam tutup, dan jumlah loker masih placeholder
- * sampai owner menjawab Q4/Q5; nilai sebenarnya diisi lewat panel admin.
+ * Data awal lokal. Koordinat dari Plus Code J7MG+73, Tj. Senang, Bandar Lampung.
+ * Radius belum dikalibrasi di lokasi; jam tutup dan jumlah loker menunggu Q4/Q5.
  */
 class DatabaseSeeder extends Seeder
 {
@@ -16,8 +16,8 @@ class DatabaseSeeder extends Seeder
         DB::table('gym_settings')->updateOrInsert(['gym_id' => 1], [
             'gym_name' => 'GymPass QR',
             'timezone' => 'Asia/Jakarta',
-            'latitude' => -6.20000000,
-            'longitude' => 106.81666600,
+            'latitude' => -5.36681250,
+            'longitude' => 105.27518750,
             'geofence_radius_m' => 30,
             'geofence_accuracy_max_m' => 150,
             'rescan_guard_seconds' => 300,
